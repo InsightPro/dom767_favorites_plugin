@@ -1,0 +1,213 @@
+/******* fav css sk **********/
+.addOrRemoveFavClass {
+    position: relative;
+    width: 30px;
+    float: right;
+    height: 30px;
+    z-index: 10;
+    background-color: #469050;
+    border-radius: 50%;
+    text-align: center;
+    padding: 3px;
+    font-size: 17px;
+    color: #fff;
+}
+.fav-icon-info-text {
+  display: none;
+  position: absolute;
+  margin-left: 0 !important;
+  left: -154px;
+  width: 150px;
+  font-weight: 500 !important;
+  background-color: #469050;
+  color: #fff;
+  font-family: "Poppins";
+  font-size: 12px !important;
+  text-align: center;
+  border-radius: 3px;
+  height: auto;
+  line-height: 30px;
+}
+.favs-icon-wrap.addOrRemoveFavClass.bookmark_icon {
+    background-color: transparent;
+}
+.job-type-badge .favs-icon-wrap.addOrRemoveFavClass.bookmark_icon {
+    color: #000;
+}
+.color-gray .favs-icon-wrap.addOrRemoveFavClass.bookmark_icon {
+ color: #aba6a6;
+}
+.color-black .favs-icon-wrap.addOrRemoveFavClass.bookmark_icon {
+    color: #000;
+}
+
+.fav-icon-info-text:after {
+    content: "";
+    width: 0;
+    height: 0;
+    position: absolute;
+    left: auto;
+    right: -6px;
+    top: 50%;
+    bottom: auto;
+    margin-top: -5px;
+    border-right-width: 0;
+    border-bottom: 5px solid transparent;
+    border-left: 6px solid #469050;
+    border-top: 5px solid transparent;
+}
+    
+.addOrRemoveFavClass:hover .fav-icon-info-text {
+    display: block;
+}
+
+
+/* fav page */
+.fav_page_list_delete_wrap {
+  position: relative;
+}
+.fav_click_del_loading_spinner {
+  position: absolute;
+  top: 0;
+  display: none;
+  background-color: #fff;
+}
+
+.favs-list-group li:hover .fav_delete_btn{
+  background-color: #0f4019;
+}
+.favs-list-group li:hover .fav_delete_btn svg{
+  color: #fff;
+}
+
+/* header fav list */
+
+.fav_list_delete_wrap{
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+  position: relative;
+  z-index: 11;
+}
+.fav_delete_btn{
+  margin-left: 5px;
+  background-color: #eeeeee;
+  color: #aaaaaa;
+  border-radius: 50%;
+  font-size: 20px;
+  width: 30px;
+  height: 30px;
+  padding: 0px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  transition: 0.15s;
+}
+.dropdown__items--list-item li:hover .fav_delete_btn {
+  background-color: #0f4019;
+  color: #fff ;
+}
+.dropdown__items--list-item li:hover .fav_delete_btn svg{
+color: #fff;
+}
+.fav_delete_btn svg {
+  width: 20px;
+  height: 20px;
+}
+.addOrRemoveFavClass .fav_click_loader_spinner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: none;
+  background-color: #fff;
+  border-radius: 50%;
+}
+
+
+
+/* The popup for noneuser */
+.addOrRemoveFavClass .noneuserpopupbox {
+  visibility: hidden;
+  width: 300px;
+  background-color: #6e0303ed;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -151px;
+}
+
+/* Popup arrow */
+.addOrRemoveFavClass .noneuserpopupbox::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #6e0303ed transparent transparent transparent;
+}
+
+/* Toggle this class - hide and show the popup */
+.addOrRemoveFavClass .show {
+  visibility: visible;
+  -webkit-animation: fadeIn 1s;
+  animation: fadeIn 1s;
+}
+
+.noneuserpopupbox.show .noneuserpopupbox_ok {
+    color: #fff;
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+    margin-top: 10px;
+}
+
+
+/* news page fav */
+/*.news_fav_bg .favs-icon-wrap.addOrRemoveFavClass.bookmark_icon {
+    background: #fff;
+}*/
+.news_fav_bg>.addOrRemoveFavClass>.fav_click_loader_spinner {
+    height:30px;
+    width: 30px;
+}
+.thumb-overlay>.thumb-content>.thumb-meta>.thumb-title.news_fav>a>.news_fav_bg>.favs-icon-wrap.addOrRemoveFavClass.bookmark_icon>svg {
+    color: #fff;
+}
+.thumb-overlay>.thumb-content>.thumb-meta>.post-meta>.thumb-title.news_fav>a>.news_fav_bg>.favs-icon-wrap.addOrRemoveFavClass.bookmark_icon>svg {
+    color: #fff;
+}
+.big-thumb-left-box>.container-wrapper>.mag-box-container>.posts-list-container>.post-item.tie-standard>.post-details>.post-meta>.thumb-title.news_fav>a>.news_fav_bg>.favs-icon-wrap.addOrRemoveFavClass.bookmark_icon>svg {
+    color: #fff !important;
+}
+.news_fav {
+    line-height: 0 !important;
+    display: inline;
+}
+.container-wrapper.widget.tie-slider-widget>.main-slider.boxed-slider.boxed-five-slides-slider.slider-in-widget>.main-slider-inner>ul.tie-slider-nav {
+    z-index: unset !important;
+}
+
+/* event past page fav */
+.evacal__widget4-wrapper>.favs-wrap>.favs-icon-wrap.addOrRemoveFavClass.bookmark_icon {
+    color: #000;
+}
+.event_box_extrainfo>.favs-wrap>.favs-icon-wrap.addOrRemoveFavClass.bookmark_icon {
+    color: #000;
+}
