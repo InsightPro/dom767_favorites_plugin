@@ -46,7 +46,7 @@ class PageTemplater {
         );
         // Add your templates to this array.
         $this->templates = array(
-            '/page-templates/public/all-favorites.php' => 'All Favourites by plugin',
+            '../../page-templates/public/all-favorites.php' => 'All Favourites by plugin',
             //'/page-templates/all-favorites-1.php' => 'All Favourites list 1',
             //'/page-templates/all-favorites-2.php' => 'All Favourites list 2',
         );  
