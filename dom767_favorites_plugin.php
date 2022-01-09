@@ -49,13 +49,23 @@ class DOM767_Favorites {
 
     ////////// load assate for admin panel //////////
     function load_dom767_fav_admin_assets( $screen ) {
+        if ( isset($_GET['page']) && $_GET['page'] == 'dom767_fav_setting_page' ) {
 
-        wp_enqueue_script( 'dom_fav_admin_main-js', DOM767_ASSETS_ADMIN_DIR . "/js/dom_fav_admin_main.js", array( 'jquery' ), $this->version, true );
+            wp_enqueue_script( 'dom_fav_admin_main-js', DOM767_ASSETS_ADMIN_DIR . "/js/dom_fav_admin_main.js", array( 'jquery' ), $this->version, true );
+
+            wp_localize_script('dom_fav_admin_main-js', 'dom_admin_fav_list', array('ajax_url'=> admin_url('admin-ajax.php'), 'security'=> wp_create_nonce('ajax_nonce')));
+
+            wp_enqueue_style( 'dom767-fav-admin-main-css', DOM767_ASSETS_ADMIN_DIR . "/css/fav-admin-main.css", null, $this->version );
+        }
+
     }
 
     ////////// load assate for front end //////////
     function dom767_load_fav_front_assets() {
         wp_enqueue_style( 'dom767-fav-main-css', DOM767_ASSETS_PUBLIC_DIR . "/css/dom_fav_main.css", null, $this->version );
+
+
+        wp_enqueue_script('js-cookie-1', DOM767_ASSETS_PUBLIC_DIR . '/js/js.cookie.min.js', array('jquery'), '1.0.0', true);
 
         wp_enqueue_script( 'dom767-fav-main-assets', DOM767_ASSETS_PUBLIC_DIR . "/js/fav_main_scripts_new.js", array( 'jquery' ), $this->version, true );
 

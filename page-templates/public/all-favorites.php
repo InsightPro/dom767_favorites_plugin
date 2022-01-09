@@ -13,21 +13,6 @@ if(is_user_logged_in()){
   $fav_post_query = all_fav_page_post_query();  
   ?>
 
-  <style type="text/css">
-    div#all_fav_list_loadmore_btn_id {
-        width: 100%;
-        background: #2f9385;
-        color: #fff;
-        font-weight: 900;
-    }
-    img.fav_loadmore_loading_img {
-        position: absolute;
-        margin-top: -23px;
-        margin-left: 60PX;
-        display: none;
-    }
-
-  </style>
 
   <div class="all-favs-wrapper">
     <div class="other-page-titles">

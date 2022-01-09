@@ -211,3 +211,16 @@ color: #fff;
 .event_box_extrainfo>.favs-wrap>.favs-icon-wrap.addOrRemoveFavClass.bookmark_icon {
     color: #000;
 }
+
+div#all_fav_list_loadmore_btn_id {
+    width: 100%;
+    background: #2f9385;
+    color: #fff;
+    font-weight: 900;
+}
+img.fav_loadmore_loading_img {
+    position: absolute;
+    margin-top: -23px;
+    margin-left: 60PX;
+    display: none;
+}

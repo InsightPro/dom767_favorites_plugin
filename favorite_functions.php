@@ -39,7 +39,8 @@ add_shortcode( 'fav_wrap_heart_shortcode', 'fav_wrap_heart_icon_shortcode' );
 function get_fav_wrap_bookmark_icon($post_id) {
 
     $posttype = get_post_type($post_id); /// get post type by Id
-    if(dom767_get_option('show_favorites_cpt_'.$posttype) ){
+    //if(dom767_get_option('show_favorites_cpt_'.$posttype) ){
+    if(get_option('show_favorites_cpt_'.$posttype) ){
 
         if ( is_user_logged_in() ) {/// if user login
 
@@ -94,7 +95,8 @@ function get_fav_wrap_bookmark_icon($post_id) {
 function get_fav_wrap_heart_icon($post_id) {
 
     $posttype = get_post_type($post_id); /// get post type by Id
-    if(dom767_get_option('show_favorites_cpt_'.$posttype) ){
+    //if(dom767_get_option('show_favorites_cpt_'.$posttype) ){
+    if(get_option('show_favorites_cpt_'.$posttype) ){
 
         if ( is_user_logged_in() ) {/// if user login
 
@@ -868,6 +870,312 @@ function get_header_fav_manu_list($user_id){
 
 
    <?php
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// Post total fav count for admin /////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////
+
+function post_total_fav_count_query() {
+
+
+    $fav_listing        = array();
+
+    if(is_user_logged_in()){
+        $user_id        = get_current_user_id();
+        $fav_listing    = get_user_meta( $user_id, 'user_fav_listing', true);
+        $fav_listing    = json_decode($fav_listing, true);
+    }
+    if ( is_array( $fav_listing ) ) {
+        $fav_listing = array_values( $fav_listing );
+        $fav_listing = array_reverse($fav_listing); /// Reverse array last to 1st
+    }
+
+      $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
+      $array_posts_type = array('post', 'jobs', 'w2dc_listing', 'announcement','ajde_events', 'knowledge_base', 'dompedia');
+
+      $args = array(
+        'post_type'      => $array_posts_type,
+        'posts_per_page' => -1,
+        'order'          => 'DESC',
+        'orderby'        =>'total_fav_listing',
+
+        'meta_query'     => array(
+          'total_fav_listing' => array(
+            'key'     => 'total_fav_listing',
+            'value'   => '1',
+            'compare' => '>='
+          )
+        ),
+
+      );
+
+
+    $query = new WP_Query( $args);
+    $fav_query_data_arr    = array();
+
+    if($query->have_posts()){
+        while( $query->have_posts() ){ 
+            $query->the_post();
+ 
+            $image_url = '';
+            if (has_post_thumbnail()) {
+                $src = wp_get_attachment_image_src( get_post_thumbnail_id(get_the_ID()), 'full' );
+                $image_url  = aq_resize($src[0], 100, 100, true);
+            }elseif(get_post_type(get_the_ID()) == 'jobs') {
+                $companies_name = get_the_terms( get_the_ID(), 'company_tax' );
+                $t_id           = $companies_name[0]->term_id;
+                $term_meta      = get_term_meta( $t_id, 'company_term_meta', true );
+                $image_url      = aq_resize($term_meta['company_logo'], 100, 100, true);
+            }
+
+            $post_type = get_post_type_object(get_post_type(get_the_ID()))->label;
+            $post_type = ($post_type  == 'Posts')? "News": $post_type;
+            $this_post_fav_total = get_post_meta( get_the_ID(), 'total_fav_listing', true );
+
+            $fav_query_data_arr[]  = array(
+                  'post_id'               => get_the_ID(),
+                  'postTypeName'          => $post_type,
+                  'post_title'            => get_the_title(),
+                  'image_url'             => $image_url,
+                  'post_permalink'        => get_the_permalink(),
+                  'total_fav'             => $this_post_fav_total,
+              );
+
+        }/// end while
+    }///end if
+
+    wp_reset_postdata();
+    //var_dump($fav_query_data_arr);
+
+    return $fav_query_data_arr;
+}///end function
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////// admin fav post query loadmore by ajax //////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+add_action( 'wp_ajax_admin_all_fav_post_loadmore', 'admin_all_fav_post_loadmore' );
+add_action( 'wp_ajax_nopriv_admin_all_fav_post_loadmore', 'admin_all_fav_post_loadmore' );
+
+function admin_all_fav_post_loadmore() {
+
+    ob_start();
+    if(is_user_logged_in()){
+        $user_id        = get_current_user_id();
+        $fav_post_query = post_total_fav_count_query(); 
+
+        function post_total_fav_count_order_desc($a, $b) {
+            if ($a['total_fav'] == $b['total_fav']) return 0;
+            return ($a['total_fav'] > $b['total_fav']) ? -1 : 1;
+        }
+        usort($fav_post_query, "post_total_fav_count_order_desc");  
+        
+        if ($fav_post_query){
+
+            $limit          = 20;
+            $total_item     = count($fav_post_query);
+            $total_pages    = ceil($total_item/$limit);  
+            $current_page   = isset( $_POST['current_page'] ) ? $_POST['current_page'] : 1;
+            $current_page   = ( $total_item > 0 ) ? min( $total_pages, $current_page ) : 1;
+            $start          = (int)$current_page * $limit - $limit;
+            $fav_post_query = array_slice( $fav_post_query, $start, $limit ); 
+
+            ?>
+            <tr>
+                <th>Post title</th>
+                <th>Post Type</th>
+                <th>Total Favorite Count</th>
+            </tr>
+            <?php
+            foreach ($fav_post_query as $fav_post){
+                $post_id        = $fav_post['post_id'];
+                $post_type      = $fav_post['postTypeName'];
+                $post_title     = $fav_post['post_title'];
+                $image_url      = $fav_post['image_url'];
+                $post_permalink = $fav_post['post_permalink'];
+                $total_fav      = $fav_post['total_fav'];
+                ?>
+
+                <tr id="fav-<?php echo esc_attr($post_id); ?>" class="favs-list-item">
+                    <td class="t-f-c-td"><?php echo $post_title ?></td>
+                    <td class="t-f-c-td"><?php echo $post_type ?></td>
+                    <td class="t-f-c-td"><?php echo $total_fav ?></td>
+                </tr>
+
+            <?php 
+            }///end foreach
+        }else{/// if no post found 
+        ?>
+        <h4 class="no-note-xl">No Favourites Found</h4>
+        <?php 
+        } 
+    }
+
+
+    $output = array();
+    $output['data'] = ob_get_clean();
+    $output['total_posts'] = $total_item;
+    $output['total_pages'] = $total_pages;
+
+    echo json_encode($output);
+    wp_die();
+
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+////////////////////// admin fav pre post query loadmore by ajax ////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+add_action( 'wp_ajax_admin_pre_fav_post_loadmore', 'admin_pre_fav_post_loadmore' );
+add_action( 'wp_ajax_nopriv_admin_pre_fav_post_loadmore', 'admin_pre_fav_post_loadmore' );
+
+function admin_pre_fav_post_loadmore() {
+
+    ob_start();
+    if(is_user_logged_in()){
+        $user_id        = get_current_user_id();
+        $fav_post_query = post_total_fav_count_query(); 
+
+        function post_total_fav_count_order_desc($a, $b) {
+            if ($a['total_fav'] == $b['total_fav']) return 0;
+            return ($a['total_fav'] > $b['total_fav']) ? -1 : 1;
+        }
+        usort($fav_post_query, "post_total_fav_count_order_desc");  
+        
+        if ($fav_post_query){
+
+            $limit          = 20;
+            $total_item     = count($fav_post_query);
+            $total_pages    = ceil($total_item/$limit);  
+            $current_page   = isset( $_POST['current_page'] ) ? $_POST['current_page'] : 1;
+            $current_page   = ( $total_item > 0 ) ? min( $total_pages, $current_page ) : 1;
+            $current_page   = ( $current_page > 1 ) ? $current_page - 1 : 1;
+            $start          = (int)$current_page * $limit - $limit;
+            $fav_post_query = array_slice( $fav_post_query, $start, $limit ); 
+
+            ?>
+            <tr>
+                <th>Post title</th>
+                <th>Post Type</th>
+                <th>Total Favorite Count</th>
+            </tr>
+            <?php
+            foreach ($fav_post_query as $fav_post){
+                $post_id        = $fav_post['post_id'];
+                $post_type      = $fav_post['postTypeName'];
+                $post_title     = $fav_post['post_title'];
+                $image_url      = $fav_post['image_url'];
+                $post_permalink = $fav_post['post_permalink'];
+                $total_fav      = $fav_post['total_fav'];
+                ?>
+
+                <tr id="fav-<?php echo esc_attr($post_id); ?>" class="favs-list-item">
+                    <td class="t-f-c-td"><?php echo $post_title ?></td>
+                    <td class="t-f-c-td"><?php echo $post_type ?></td>
+                    <td class="t-f-c-td"><?php echo $total_fav ?></td>
+                </tr>
+
+            <?php 
+            }///end foreach
+        }else{/// if no post found 
+        ?>
+        <h4 class="no-note-xl">No Favourites Found</h4>
+        <?php 
+        } 
+    }
+
+
+    $output = array();
+    $output['data'] = ob_get_clean();
+    $output['total_posts'] = $total_item;
+    $output['total_pages'] = $total_pages;
+    $output['current_page'] = $current_page;
+
+    echo json_encode($output);
+    wp_die();
+
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+////////////////////// admin fav next post query loadmore by ajax ////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+add_action( 'wp_ajax_admin_next_fav_post_loadmore', 'admin_next_fav_post_loadmore' );
+add_action( 'wp_ajax_nopriv_admin_next_fav_post_loadmore', 'admin_next_fav_post_loadmore' );
+
+function admin_next_fav_post_loadmore() {
+
+    ob_start();
+    if(is_user_logged_in()){
+        $user_id        = get_current_user_id();
+        $fav_post_query = post_total_fav_count_query(); 
+
+        function post_total_fav_count_order_desc($a, $b) {
+            if ($a['total_fav'] == $b['total_fav']) return 0;
+            return ($a['total_fav'] > $b['total_fav']) ? -1 : 1;
+        }
+        usort($fav_post_query, "post_total_fav_count_order_desc");  
+        
+        if ($fav_post_query){
+
+            $limit          = 20;
+            $total_item     = count($fav_post_query);
+            $total_pages    = ceil($total_item/$limit);  
+            $current_page   = isset( $_POST['current_page'] ) ? $_POST['current_page'] : 1;
+            $current_page   = ( $total_item > 0 ) ? min( $total_pages, $current_page ) : 1;
+            $current_page   = ( $current_page < $total_pages ) ? $current_page + 1 : 1;
+            $current_page   = ( $current_page == $total_pages ) ? $total_pages : $current_page;
+            $start          = (int)$current_page * $limit - $limit;
+            $fav_post_query = array_slice( $fav_post_query, $start, $limit ); 
+
+            ?>
+            <tr>
+                <th>Post title</th>
+                <th>Post Type</th>
+                <th>Total Favorite Count</th>
+            </tr>
+            <?php
+            foreach ($fav_post_query as $fav_post){
+                $post_id        = $fav_post['post_id'];
+                $post_type      = $fav_post['postTypeName'];
+                $post_title     = $fav_post['post_title'];
+                $image_url      = $fav_post['image_url'];
+                $post_permalink = $fav_post['post_permalink'];
+                $total_fav      = $fav_post['total_fav'];
+                ?>
+
+                <tr id="fav-<?php echo esc_attr($post_id); ?>" class="favs-list-item">
+                    <td class="t-f-c-td"><?php echo $post_title ?></td>
+                    <td class="t-f-c-td"><?php echo $post_type ?></td>
+                    <td class="t-f-c-td"><?php echo $total_fav ?></td>
+                </tr>
+
+            <?php 
+            }///end foreach
+        }else{/// if no post found 
+        ?>
+        <h4 class="no-note-xl">No Favourites Found</h4>
+        <?php 
+        } 
+    }
+
+
+    $output = array();
+    $output['data'] = ob_get_clean();
+    $output['total_posts'] = $total_item;
+    $output['total_pages'] = $total_pages;
+    $output['current_page'] = $current_page;
+
+    echo json_encode($output);
+    wp_die();
+
 }
 
 /********************************************END******************************************/
