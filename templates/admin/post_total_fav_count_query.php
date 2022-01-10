@@ -64,7 +64,12 @@ if(is_user_logged_in()){
       <?php
 
       for( $i=1; $i<= $total_pages; $i++ ){
-        echo '<li class="fav_admin_paginations" id="fav_admin_paginations'.$i.'" data-total_page="'. $total_pages .'" data-page="'.$i.'" >'. $i.'</li>';
+        if ($i<= 20) {
+          echo '<li class="fav_admin_paginations" id="fav_admin_paginations'.$i.'" data-total_page="'. $total_pages .'" data-page="'.$i.'" >'. $i.'</li>';
+        }
+        if ($i == 21) {
+          echo '<li class="fav_admin_paginations" id="fav_admin_paginations'.$i.'" data-total_page="'. $total_pages .'" data-page="'.$i.'" >'. '...'.'</li>';
+        }
       }
       ?>
       <li class="fav_admin_paginations_next" data-total_page="<?php echo $total_pages ?>" data-page="1" > >> </li>

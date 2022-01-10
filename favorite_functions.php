@@ -1178,4 +1178,71 @@ function admin_next_fav_post_loadmore() {
 
 }
 
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+////////////////////// fav admin pagination num count 20 by ajax ////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+
+add_action( 'wp_ajax_fav_admin_pagi_num_count_20', 'fav_admin_pagi_num_count_20' );
+add_action( 'wp_ajax_nopriv_fav_admin_pagi_num_count_20', 'fav_admin_pagi_num_count_20' );
+
+function fav_admin_pagi_num_count_20() {
+
+    ob_start();
+
+        
+    $current_page = isset( $_POST['current_page'] ) ? $_POST['current_page'] : 1; 
+    $total_pages   = isset( $_POST['total_page'] ) ? $_POST['total_page'] : 1; 
+
+    ?>
+      <li class="fav_admin_paginations_pre" data-total_page="<?php echo $total_pages ?>" data-page="1" > << </li>
+        <?php
+
+        $pre_num0   = ($current_page >= 10) ? $current_page - 10: 1 ;
+        $pre_num    = ($pre_num0 >= 1)? $pre_num0 : 1;
+
+        $next_num0  = $current_page + 10;
+        $next_num   = ($next_num0 <= $total_pages)? $next_num0: $total_pages;
+
+        $ls10 = ($current_page < 10)? 10 - $current_page : 0;
+        $tnc = $total_pages - $current_page;
+        $ad10 = ( $tnc < 10)? 10 - $tnc : 0;
+        $next_num = $next_num + $ls10;
+        $pre_num = $pre_num - $ad10;
+
+        $pre_hide   = ($pre_num > 1 )? $pre_num - 1: 1;
+        $next_hide  = ($next_num < $total_pages ) ? $next_num + 1: $total_pages;
+
+        if ($pre_num > 1) {
+          echo '<li class="fav_admin_paginations" id="fav_admin_paginations'.$pre_hide.'" data-total_page="'. $total_pages .'" data-page="'.$pre_hide.'" >'. '...'.'</li>';
+        }
+
+
+        for( $i = $pre_num; $i<= $next_num; $i++ ){
+          echo '<li class="fav_admin_paginations" id="fav_admin_paginations'.$i.'" data-total_page="'. $total_pages .'" data-page="'.$i.'" >'. $i.'</li>';
+        }
+
+        if ($next_num < $total_pages) {
+          echo '<li class="fav_admin_paginations" id="fav_admin_paginations'.$next_hide.'" data-total_page="'. $total_pages .'" data-page="'.$next_hide.'" >'. '...'.'</li>';
+        }
+
+        ?>
+        <li class="fav_admin_paginations_next" data-total_page="<?php echo $total_pages ?>" data-page="1" > >> </li>
+
+
+
+    <?php
+
+    $output = array();
+    $output['data'] = ob_get_clean();
+    $output['total_pages'] = $total_pages;
+    $output['current_page'] = $current_page;
+
+    echo json_encode($output);
+    wp_die();
+
+}
+
+
 /********************************************END******************************************/
