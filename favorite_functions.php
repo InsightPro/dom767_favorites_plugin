@@ -1199,8 +1199,8 @@ function fav_admin_pagi_num_count_20() {
       <li class="fav_admin_paginations_pre" data-total_page="<?php echo $total_pages ?>" data-page="1" > << </li>
         <?php
 
-        $pre_num0   = ($current_page >= 10) ? $current_page - 10: 1 ;
-        $pre_num    = ($pre_num0 >= 1)? $pre_num0 : 1;
+        $pre_num0   = ($current_page > 10) ? $current_page - 10: 1 ;
+        $pre_num    = ($pre_num0 > 1)? $pre_num0 : 1;
 
         $next_num0  = $current_page + 10;
         $next_num   = ($next_num0 <= $total_pages)? $next_num0: $total_pages;
@@ -1209,7 +1209,8 @@ function fav_admin_pagi_num_count_20() {
         $tnc = $total_pages - $current_page;
         $ad10 = ( $tnc < 10)? 10 - $tnc : 0;
         $next_num = $next_num + $ls10;
-        $pre_num = $pre_num - $ad10;
+        $next_num = ($next_num < $total_pages) ? $next_num : $total_pages;
+        $pre_num = ($pre_num > 1)?$pre_num - $ad10 : $pre_num;
 
         $pre_hide   = ($pre_num > 1 )? $pre_num - 1: 1;
         $next_hide  = ($next_num < $total_pages ) ? $next_num + 1: $total_pages;
@@ -1217,7 +1218,6 @@ function fav_admin_pagi_num_count_20() {
         if ($pre_num > 1) {
           echo '<li class="fav_admin_paginations" id="fav_admin_paginations'.$pre_hide.'" data-total_page="'. $total_pages .'" data-page="'.$pre_hide.'" >'. '...'.'</li>';
         }
-
 
         for( $i = $pre_num; $i<= $next_num; $i++ ){
           echo '<li class="fav_admin_paginations" id="fav_admin_paginations'.$i.'" data-total_page="'. $total_pages .'" data-page="'.$i.'" >'. $i.'</li>';
